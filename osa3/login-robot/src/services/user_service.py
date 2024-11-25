@@ -1,4 +1,5 @@
 from entities.user import User
+import re
 
 
 class UserInputError(Exception):
@@ -26,7 +27,6 @@ class UserService:
 
     def create_user(self, username, password):
         self.validate(username, password)
-
         user = self._user_repository.create(
             User(username, password)
         )
@@ -36,5 +36,11 @@ class UserService:
     def validate(self, username, password):
         if not username or not password:
             raise UserInputError("Username and password are required")
+        if len(username) < 3:
+            raise UserInputError("Username is too short")
+        if not re.match("^[a-z]{3,}$", username):
+            raise UserInputError("Username does not meet the requirements.")
+        if re.match("(^[a-zA-Z]*$)|(^.{,7}$)", password): #vain a-Z merkkejä mikä tahansa alle 7 merkkinen
+            raise UserInputError("Password does not meet the requirements.")
 
         # toteuta loput tarkastukset tänne ja nosta virhe virhetilanteissa
